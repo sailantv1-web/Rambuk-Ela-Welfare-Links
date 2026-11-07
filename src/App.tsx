@@ -12,6 +12,7 @@ import { MembersDirectory } from './components/MembersDirectory';
 import { MembersTeaserCard } from './components/MembersTeaserCard';
 import { LocationCard } from './components/LocationCard';
 import { WelfareHighlights } from './components/WelfareHighlights';
+import { WelfareAssistanceCard } from './components/WelfareAssistanceCard';
 import { Footer } from './components/Footer';
 import { Toast } from './components/Toast';
 import { QuickInquiryModal } from './components/QuickInquiryModal';
@@ -96,7 +97,13 @@ export default function App() {
             {/* 4. Leadership Gateway Teaser Card (routes to separate members page) */}
             <MembersTeaserCard onOpenMembers={() => navigateTo('members')} />
 
-            {/* 5. Community Welfare Pillars & Highlights */}
+            {/* 5. Highlighted Welfare Assistance & Contribution Card (Styled like Banking Card) */}
+            <WelfareAssistanceCard
+              onOpenQuickMessage={handleOpenInquiry}
+              onShowToast={showToast}
+            />
+
+            {/* 6. Community Welfare Pillars & Highlights */}
             <WelfareHighlights onOpenQuickMessage={handleOpenInquiry} />
 
             {/* 6. Headquarters Address & Interactive Map Launcher */}

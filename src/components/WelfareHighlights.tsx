@@ -130,25 +130,6 @@ export const WelfareHighlights: React.FC<WelfareHighlightsProps> = ({ onOpenQuic
           );
         })}
       </div>
-
-      {/* Quick Action Prompt to submit request */}
-      <div className="mt-3 p-3 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-sky-500/10 to-blue-500/10 border border-emerald-300/40 flex items-center justify-between">
-        <div className="min-w-0 pr-2">
-          <div className="text-xs font-bold text-emerald-950">
-            Need Welfare Assistance or Wish to Contribute?
-          </div>
-          <div className="text-[11px] text-emerald-800/80">
-            Reach out directly to the official association desk.
-          </div>
-        </div>
-        <button
-          onClick={() => onOpenQuickMessage("General Community Inquiry")}
-          className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shrink-0 shadow-xs active:scale-95 transition-all flex items-center gap-1"
-        >
-          <span>Inquire</span>
-          <ChevronRight className="w-3.5 h-3.5" />
-        </button>
-      </div>
     </section>
   );
 };
