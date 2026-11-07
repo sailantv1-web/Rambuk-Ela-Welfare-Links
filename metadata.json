@@ -1,0 +1,6 @@
+{
+  "name": "Rambuk-Ela Welfare Association",
+  "description": "Official Digital Directory & Community Connect Portal for Rambuk-Ela Welfare Association (රඹුක්-ඇල සුභසාධන සංවිධානය).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

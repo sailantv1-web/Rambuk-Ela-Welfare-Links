@@ -1,0 +1,128 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+.font-sinhala {
+  font-family: 'Noto Sans Sinhala', 'Plus Jakarta Sans', sans-serif;
+}
+
+.font-mono-numbers {
+  font-family: 'JetBrains Mono', monospace;
+  font-feature-settings: "tnum" 1;
+}
+
+/* 3D Tactile Button & Glass Styling */
+.btn-3d {
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 
+              0 2px 4px -2px rgba(0, 0, 0, 0.06), 
+              inset 0 1px 1px rgba(255, 255, 255, 0.7);
+}
+
+.btn-3d:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05),
+              inset 0 2px 4px rgba(0, 0, 0, 0.12);
+}
+
+.glass-card {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 10px 25px -5px rgba(14, 116, 144, 0.08), 
+              0 8px 10px -6px rgba(14, 116, 144, 0.04);
+}
+
+.glass-card-hover {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 30px -8px rgba(14, 116, 144, 0.12),
+              0 10px 12px -6px rgba(14, 116, 144, 0.06);
+}
+
+/* Subtle cloud drift animation */
+@keyframes cloudFloatSlow {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  50% {
+    transform: translate(25px, -12px) scale(1.04);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+@keyframes cloudFloatFast {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  50% {
+    transform: translate(-30px, 15px) scale(0.97);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+.animate-cloud-slow {
+  animation: cloudFloatSlow 22s ease-in-out infinite;
+}
+
+.animate-cloud-fast {
+  animation: cloudFloatFast 17s ease-in-out infinite;
+}
+
+/* Animated Logo Circle Strokes in Logo Colors (Lime Green & Royal Blue) */
+@keyframes spinRingClockwise {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spinRingCounterClockwise {
+  0% {
+    transform: rotate(360deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes strokeDashPulse {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dashoffset: 120;
+  }
+  100% {
+    stroke-dashoffset: 240;
+  }
+}
+
+.animate-logo-stroke-cw {
+  animation: spinRingClockwise 10s linear infinite;
+  transform-origin: center;
+}
+
+.animate-logo-stroke-ccw {
+  animation: spinRingCounterClockwise 8s linear infinite;
+  transform-origin: center;
+}
+
+.animate-logo-dash-pulse {
+  animation: strokeDashPulse 5s ease-in-out infinite;
+}
