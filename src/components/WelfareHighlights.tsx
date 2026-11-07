@@ -2,11 +2,15 @@ import React from 'react';
 import { HeartHandshake, GraduationCap, Activity, Building2, ChevronRight } from 'lucide-react';
 import { ASSOCIATION_DATA } from '../data/associationData';
 
+import rambukElaScenery from '../assets/images/rambuk_ela_hills_scenery_1794051811104.jpg';
+
 interface WelfareHighlightsProps {
   onOpenQuickMessage: (topic?: string) => void;
 }
 
 export const WelfareHighlights: React.FC<WelfareHighlightsProps> = ({ onOpenQuickMessage }) => {
+  const [imageLoaded, setImageLoaded] = React.useState(false);
+
   const pillars = [
     {
       id: "welfare-1",
@@ -54,33 +58,43 @@ export const WelfareHighlights: React.FC<WelfareHighlightsProps> = ({ onOpenQuic
         </span>
       </div>
 
-      {/* Community Visual Feature Card with Generated Photography */}
-      <div className="relative mb-3 rounded-3xl overflow-hidden shadow-md border border-white/80 group">
-        <div className="h-40 w-full relative bg-slate-800">
+      {/* Community Visual Feature Card with Rambuk Ela Beautiful Scenic View */}
+      <div className="relative mb-3.5 rounded-3xl overflow-hidden shadow-lg border border-white/90 group bg-slate-900">
+        <div className="h-44 sm:h-52 w-full relative">
           <img
-            src="/src/assets/images/community_unity_hands_1794051811812.jpg"
-            alt="Rambuk Ela Community Unity and Charity"
+            src={rambukElaScenery || "/assets/images/rambuk_ela_view.jpg"}
+            alt="Beautiful Scenic View of Rambuk Ela, Sri Lanka"
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-            referrerPolicy="no-referrer"
+            loading="eager"
+            onLoad={() => setImageLoaded(true)}
             onError={(e) => {
-              // Fallback to secondary image or gradient container
               const target = e.currentTarget;
-              target.onerror = null;
-              target.src = "/src/assets/images/rambuk_ela_hills_scenery_1794051811104.jpg";
+              if (target.src !== window.location.origin + "/assets/images/rambuk_ela_view.jpg") {
+                target.src = "/assets/images/rambuk_ela_view.jpg";
+              }
             }}
           />
-          {/* Contrast Scrim */}
-          <div className="absolute inset-0 bg-gradient-to-t from-blue-950/90 via-blue-950/40 to-transparent" />
 
-          {/* Overlay Text */}
-          <div className="absolute bottom-3 left-3 right-3 text-white">
-            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/80 backdrop-blur-xs text-[10px] font-bold uppercase tracking-wider mb-1">
+          {/* Contrast Scrim to preserve image clarity while ensuring text contrast */}
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-black/10 pointer-events-none" />
+
+          {/* Top Location Pill Badge */}
+          <div className="absolute top-3 left-3 z-10">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/45 backdrop-blur-md text-[10px] font-bold text-white border border-white/30 shadow-xs tracking-wide">
+              <span>🇱🇰</span>
+              <span>Rambuk Ela, Central Province</span>
+            </span>
+          </div>
+
+          {/* Bottom Overlay Text */}
+          <div className="absolute bottom-3 left-3.5 right-3.5 text-white z-10">
+            <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/90 backdrop-blur-sm text-[10px] font-extrabold uppercase tracking-wider mb-1.5 text-white shadow-xs">
               Community Solidarity
             </div>
-            <h3 className="text-sm font-bold leading-tight">
+            <h3 className="text-base sm:text-lg font-extrabold leading-tight drop-shadow-sm text-white">
               Dedicated to serving every family in Rambuk Ela
             </h3>
-            <p className="text-[11px] text-sky-200 mt-0.5">
+            <p className="text-xs text-sky-100/95 font-medium mt-0.5 drop-shadow-xs">
               Empowering unity, dignity, and collective upliftment.
             </p>
           </div>
