@@ -106,10 +106,10 @@ export default function App() {
             {/* 6. Community Welfare Pillars & Highlights */}
             <WelfareHighlights onOpenQuickMessage={handleOpenInquiry} />
 
-            {/* 6. Headquarters Address & Interactive Map Launcher */}
+            {/* 7. Headquarters Address & Interactive Map Launcher */}
             <LocationCard onShowToast={showToast} />
 
-            {/* 7. Footer */}
+            {/* 8. Footer */}
             <Footer />
           </>
         ) : (

@@ -73,7 +73,7 @@ export const MembersDirectory: React.FC<MembersDirectoryProps> = ({ onBack, onSh
           bg: 'bg-gradient-to-tr from-amber-500 to-amber-300 text-amber-950 border-amber-300 shadow-amber-500/20',
           badgeText: 'Leadership',
           badgeIcon: Award,
-          tagColor: 'bg-amber-100 text-amber-900 border-amber-300',
+          tagColor: 'bg-amber-100 text-amber-800 border-amber-200',
           initials
         };
       case 'emerald':
@@ -81,7 +81,7 @@ export const MembersDirectory: React.FC<MembersDirectoryProps> = ({ onBack, onSh
           bg: 'bg-gradient-to-tr from-emerald-600 to-emerald-400 text-white border-emerald-300 shadow-emerald-500/20',
           badgeText: 'Executive',
           badgeIcon: Shield,
-          tagColor: 'bg-emerald-100 text-emerald-900 border-emerald-300',
+          tagColor: 'bg-emerald-100 text-emerald-800 border-emerald-200',
           initials
         };
       case 'sapphire':
@@ -89,7 +89,7 @@ export const MembersDirectory: React.FC<MembersDirectoryProps> = ({ onBack, onSh
           bg: 'bg-gradient-to-tr from-blue-600 to-sky-400 text-white border-sky-300 shadow-blue-500/20',
           badgeText: 'Finance & Accounts',
           badgeIcon: Briefcase,
-          tagColor: 'bg-blue-100 text-blue-900 border-blue-300',
+          tagColor: 'bg-blue-100 text-blue-800 border-blue-200',
           initials
         };
       default:
@@ -261,21 +261,17 @@ export const MembersDirectory: React.FC<MembersDirectoryProps> = ({ onBack, onSh
 
                     {/* Name & Designation */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <h3 className="text-sm font-bold text-slate-900 truncate">
-                          {member.name}
-                        </h3>
-                        {member.tierBadgeColor === 'gold' && (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-amber-100 text-amber-800 font-bold border border-amber-200">
-                            President
-                          </span>
-                        )}
-                      </div>
+                      <h3 className="text-sm font-bold text-slate-900 truncate">
+                        {member.name}
+                      </h3>
                       
-                      <div className="flex items-center gap-2 text-xs text-slate-600 mt-0.5">
-                        <span className="font-semibold text-emerald-800">{member.designation}</span>
+                      {/* Highlighted Designation Pill Badge below name + Phone Number */}
+                      <div className="flex items-center gap-2 text-xs text-slate-600 mt-1 flex-wrap">
+                        <span className={`text-[10px] px-2 py-0.5 rounded-md font-bold border tracking-wide shadow-xs shrink-0 ${avatar.tagColor}`}>
+                          {member.designation}
+                        </span>
                         <span aria-hidden="true" className="text-slate-300">·</span>
-                        <span className="font-mono-numbers text-slate-500 text-[11px]">{member.formattedPhone}</span>
+                        <span className="font-mono-numbers text-slate-500 text-[11px] font-medium">{member.formattedPhone}</span>
                       </div>
                     </div>
 
