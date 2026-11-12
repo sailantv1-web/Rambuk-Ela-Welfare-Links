@@ -58,14 +58,22 @@ export const MembersTeaserCard: React.FC<MembersTeaserCardProps> = ({ onOpenMemb
           </p>
 
           {/* Quick Leadership Highlight */}
-          <div className="mt-3 p-2.5 rounded-2xl bg-slate-50/80 border border-slate-200/60 text-xs flex items-center justify-between">
-            <div>
-              <div className="text-[10px] uppercase font-bold text-slate-400">President</div>
-              <div className="font-bold text-slate-800">{president?.name || 'Hussain Rifna'}</div>
+          <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+            <div className="p-2.5 rounded-2xl bg-amber-50/80 border border-amber-200/80">
+              <div className="inline-flex items-center gap-1 text-[10px] uppercase font-black text-amber-800 mb-0.5">
+                <span>👑</span>
+                <span>President</span>
+              </div>
+              <div className="font-extrabold text-slate-900 truncate">{president?.name || 'Hussain Rifna'}</div>
+              <div className="text-[10px] font-semibold text-amber-700 font-sinhala">සභාපති</div>
             </div>
-            <div className="text-right">
-              <div className="text-[10px] uppercase font-bold text-slate-400">Vice President</div>
-              <div className="font-bold text-slate-800">{vp?.name || 'Shafeek Wahab'}</div>
+            <div className="p-2.5 rounded-2xl bg-emerald-50/80 border border-emerald-200/80 text-left">
+              <div className="inline-flex items-center gap-1 text-[10px] uppercase font-black text-emerald-800 mb-0.5">
+                <span>🛡️</span>
+                <span>Vice President</span>
+              </div>
+              <div className="font-extrabold text-slate-900 truncate">{vp?.name || 'Shafeek Wahab'}</div>
+              <div className="text-[10px] font-semibold text-emerald-700 font-sinhala">උප සභාපති</div>
             </div>
           </div>
         </div>

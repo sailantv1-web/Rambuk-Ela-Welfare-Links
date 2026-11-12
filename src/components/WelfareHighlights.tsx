@@ -2,14 +2,11 @@ import React from 'react';
 import { HeartHandshake, GraduationCap, Activity, Building2, ChevronRight } from 'lucide-react';
 import { ASSOCIATION_DATA } from '../data/associationData';
 
-import rambukElaScenery from '../assets/images/rambuk_ela_hills_scenery_1794051811104.jpg';
-
 interface WelfareHighlightsProps {
   onOpenQuickMessage: (topic?: string) => void;
 }
 
 export const WelfareHighlights: React.FC<WelfareHighlightsProps> = ({ onOpenQuickMessage }) => {
-  const [imageLoaded, setImageLoaded] = React.useState(false);
 
   const pillars = [
     {
@@ -60,18 +57,18 @@ export const WelfareHighlights: React.FC<WelfareHighlightsProps> = ({ onOpenQuic
 
       {/* Community Visual Feature Card with Rambuk Ela Beautiful Scenic View */}
       <div className="relative mb-3.5 rounded-3xl overflow-hidden shadow-lg border border-white/90 group bg-slate-900">
-        <div className="h-44 sm:h-52 w-full relative">
+        <div 
+          className="h-44 sm:h-52 w-full relative bg-cover bg-center"
+          style={{ backgroundImage: `url('/assets/images/rambuk_ela_view.jpg')` }}
+        >
           <img
-            src={rambukElaScenery || "/assets/images/rambuk_ela_view.jpg"}
+            src="/assets/images/rambuk_ela_view.jpg"
             alt="Beautiful Scenic View of Rambuk Ela, Sri Lanka"
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             loading="eager"
-            onLoad={() => setImageLoaded(true)}
             onError={(e) => {
-              const target = e.currentTarget;
-              if (target.src !== window.location.origin + "/assets/images/rambuk_ela_view.jpg") {
-                target.src = "/assets/images/rambuk_ela_view.jpg";
-              }
+              // Hide broken image symbol if anything fails
+              (e.currentTarget as HTMLElement).style.display = 'none';
             }}
           />
 

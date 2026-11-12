@@ -15,6 +15,7 @@ export const QuickInquiryModal: React.FC<QuickInquiryModalProps> = ({
 }) => {
   const [topic, setTopic] = useState(initialTopic);
   const [name, setName] = useState('');
+  const [address, setAddress] = useState('');
   const [message, setMessage] = useState('');
 
   if (!isOpen) return null;
@@ -36,6 +37,7 @@ export const QuickInquiryModal: React.FC<QuickInquiryModalProps> = ({
       `*RAMBUK-ELA WELFARE ASSOCIATION*`,
       `*Subject:* ${topic}`,
       name.trim() ? `*From:* ${name.trim()}` : null,
+      address.trim() ? `*Address:* ${address.trim()}` : null,
       message.trim() ? `*Message:* ${message.trim()}` : null,
       `---`,
       `Sent via Official Digital Directory Portal`
@@ -108,6 +110,20 @@ export const QuickInquiryModal: React.FC<QuickInquiryModalProps> = ({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Brother / Sister from Rambuk Ela"
+              className="w-full text-xs p-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500 text-slate-800"
+            />
+          </div>
+
+          {/* Address Field */}
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1">
+              Your Address (Optional)
+            </label>
+            <input
+              type="text"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="e.g. # 209, Kandy Road, Rambuk Ela"
               className="w-full text-xs p-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500 text-slate-800"
             />
           </div>
