@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { ASSOCIATION_DATA, BoardMember, generateMemberVCard } from '../data/associationData';
-import { Search, Phone, Users, Shield, Award, Briefcase, Copy, Check, Download, X, ArrowLeft, Crown, ShieldCheck } from 'lucide-react';
+import { Search, Phone, Users, Copy, Check, Download, X, ArrowLeft } from 'lucide-react';
 
 interface MembersDirectoryProps {
   onBack: () => void;
@@ -16,71 +16,14 @@ export const MembersDirectory: React.FC<MembersDirectoryProps> = ({ onBack, onSh
 
   const members = ASSOCIATION_DATA.boardMembers;
 
-  const presidentMember = useMemo(
-    () => members.find((m) => m.designation === 'President'),
-    [members]
-  );
-
-  const vicePresidentMember = useMemo(
-    () => members.find((m) => m.designation === 'Vice President'),
-    [members]
-  );
-
-  // Check if President box should be shown based on category & search
-  const showPresident = useMemo(() => {
-    if (!presidentMember) return false;
-    if (activeCategory !== 'all' && activeCategory !== 'executive') return false;
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase().trim();
-      return (
-        presidentMember.name.toLowerCase().includes(q) ||
-        presidentMember.designation.toLowerCase().includes(q) ||
-        presidentMember.phone.includes(q) ||
-        presidentMember.formattedPhone.toLowerCase().includes(q) ||
-        'president'.includes(q) ||
-        'hussain'.includes(q) ||
-        'rifna'.includes(q)
-      );
-    }
-    return true;
-  }, [presidentMember, activeCategory, searchQuery]);
-
-  // Check if Vice President box should be shown based on category & search
-  const showVicePresident = useMemo(() => {
-    if (!vicePresidentMember) return false;
-    if (activeCategory !== 'all' && activeCategory !== 'executive') return false;
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase().trim();
-      return (
-        vicePresidentMember.name.toLowerCase().includes(q) ||
-        vicePresidentMember.designation.toLowerCase().includes(q) ||
-        vicePresidentMember.phone.includes(q) ||
-        vicePresidentMember.formattedPhone.toLowerCase().includes(q) ||
-        'vice president'.includes(q) ||
-        'shafeek'.includes(q) ||
-        'wahab'.includes(q)
-      );
-    }
-    return true;
-  }, [vicePresidentMember, activeCategory, searchQuery]);
-
-  // Council and committee members (excluding President & VP if they are displayed in the featured presidium)
-  const remainingMembers = useMemo(() => {
+  const filteredMembers = useMemo(() => {
     return members.filter((member) => {
       // Category filter
       if (activeCategory !== 'all' && member.category !== activeCategory) {
         return false;
       }
 
-      // If in 'all' or 'executive', President & VP are showcased in their dedicated boxes
-      if (
-        (activeCategory === 'all' || activeCategory === 'executive') &&
-        (member.designation === 'President' || member.designation === 'Vice President')
-      ) {
-        return false;
-      }
-
-      // Search query
+      // Search query (matches name, designation, or phone number)
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase().trim();
         const matchesName = member.name.toLowerCase().includes(query);
@@ -93,8 +36,6 @@ export const MembersDirectory: React.FC<MembersDirectoryProps> = ({ onBack, onSh
       return true;
     });
   }, [members, activeCategory, searchQuery]);
-
-  const hasAnyMatches = showPresident || showVicePresident || remainingMembers.length > 0;
 
   const handleCopyPhone = async (member: BoardMember) => {
     try {
@@ -121,48 +62,52 @@ export const MembersDirectory: React.FC<MembersDirectoryProps> = ({ onBack, onSh
     onShowToast(`Contact card for ${member.name} downloaded!`);
   };
 
-  // Helper for tier-based avatar styling for remaining members
-  const getAvatarBadge = (member: BoardMember) => {
+  // Helper for member avatar and badge styling
+  // Both President (Hussain Rifna) and Vice President (Shafeek Wahab) share the same golden look
+  const getMemberStyling = (member: BoardMember) => {
     const initials = member.name
       .split(' ')
       .map((part) => part[0])
       .slice(0, 2)
       .join('');
 
-    switch (member.tierBadgeColor) {
-      case 'gold':
-        return {
-          bg: 'bg-gradient-to-tr from-amber-500 to-amber-300 text-amber-950 border-amber-300 shadow-amber-500/20',
-          badgeText: 'Leadership',
-          badgeIcon: Award,
-          tagColor: 'bg-amber-100 text-amber-900 border-amber-200',
-          initials
-        };
-      case 'emerald':
-        return {
-          bg: 'bg-gradient-to-tr from-emerald-600 to-emerald-400 text-white border-emerald-300 shadow-emerald-500/20',
-          badgeText: 'Executive',
-          badgeIcon: Shield,
-          tagColor: 'bg-emerald-100 text-emerald-900 border-emerald-200',
-          initials
-        };
-      case 'sapphire':
-        return {
-          bg: 'bg-gradient-to-tr from-blue-600 to-sky-400 text-white border-sky-300 shadow-blue-500/20',
-          badgeText: 'Finance & Accounts',
-          badgeIcon: Briefcase,
-          tagColor: 'bg-blue-100 text-blue-900 border-blue-200',
-          initials
-        };
-      default:
-        return {
-          bg: 'bg-gradient-to-tr from-slate-600 to-teal-500 text-white border-teal-200 shadow-teal-500/10',
-          badgeText: 'Committee',
-          badgeIcon: Users,
-          tagColor: 'bg-slate-100 text-slate-800 border-slate-200',
-          initials
-        };
+    const isPresident = member.designation === 'President';
+    const isVicePresident = member.designation === 'Vice President';
+
+    // Both President and Vice President in golden look
+    if (isPresident || isVicePresident) {
+      return {
+        avatarBg: 'bg-amber-400 text-slate-950 font-bold shadow-xs',
+        badgeBg: 'bg-amber-100 text-amber-900 border-amber-300/80',
+        initials,
+        showBadge: true
+      };
     }
+
+    if (member.category === 'executive') {
+      return {
+        avatarBg: 'bg-emerald-500 text-white font-bold shadow-xs',
+        badgeBg: 'bg-emerald-100 text-emerald-900 border-emerald-300/80',
+        initials,
+        showBadge: true
+      };
+    }
+
+    if (member.category === 'treasurer') {
+      return {
+        avatarBg: 'bg-sky-500 text-white font-bold shadow-xs',
+        badgeBg: 'bg-sky-100 text-sky-900 border-sky-300/80',
+        initials,
+        showBadge: true
+      };
+    }
+
+    return {
+      avatarBg: 'bg-slate-700 text-white font-bold shadow-xs',
+      badgeBg: 'bg-slate-100 text-slate-800 border-slate-300/80',
+      initials,
+      showBadge: true
+    };
   };
 
   return (
@@ -283,337 +228,120 @@ export const MembersDirectory: React.FC<MembersDirectoryProps> = ({ onBack, onSh
           </button>
         </div>
 
-        {/* Members Content Area */}
-        {!hasAnyMatches ? (
-          <div className="text-center py-10 px-4 rounded-3xl glass-card border border-white/80">
-            <Users className="w-8 h-8 mx-auto text-slate-400 mb-2" />
-            <div className="text-sm font-semibold text-slate-700">No members found</div>
-            <div className="text-xs text-slate-500 mt-1">Try clearing your search query or filter</div>
-            <button
-              onClick={() => {
-                setSearchQuery('');
-                setActiveCategory('all');
-              }}
-              className="mt-3 px-3.5 py-1.5 rounded-xl bg-sky-600 text-white text-xs font-semibold"
-            >
-              Reset Filters
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {/* ============================================================ */}
-            {/* DISTINCT EXECUTIVE LEADERSHIP SHOWCASE (PRESIDENT & VP)       */}
-            {/* ============================================================ */}
-            {(showPresident || showVicePresident) && (
-              <section className="space-y-3" aria-label="Executive Leadership">
-                <div className="flex items-center justify-between px-1">
-                  <div className="flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-blue-950">
-                    <Crown className="w-3.5 h-3.5 text-amber-600 fill-amber-500" />
-                    <span>Executive Leadership</span>
-                    <span className="font-sinhala text-[11px] font-bold text-emerald-800">· ප්‍රධාන නායකත්වය</span>
-                  </div>
-                  <span className="text-[10px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
-                    Highest Office
-                  </span>
-                </div>
+        {/* Member Cards List matching requested style */}
+        <div className="space-y-3">
+          {filteredMembers.length === 0 ? (
+            <div className="text-center py-10 px-4 rounded-3xl glass-card border border-white/80">
+              <Users className="w-8 h-8 mx-auto text-slate-400 mb-2" />
+              <div className="text-sm font-semibold text-slate-700">No members found</div>
+              <div className="text-xs text-slate-500 mt-1">Try clearing your search query or filter</div>
+              <button
+                onClick={() => {
+                  setSearchQuery('');
+                  setActiveCategory('all');
+                }}
+                className="mt-3 px-3.5 py-1.5 rounded-xl bg-sky-600 text-white text-xs font-semibold"
+              >
+                Reset Filters
+              </button>
+            </div>
+          ) : (
+            filteredMembers.map((member) => {
+              const style = getMemberStyling(member);
+              const waGreeting = `Assalamu Alaikum / Greetings Mr. ${member.name}, I am contacting you regarding Rambuk-Ela Welfare Association.`;
+              const waLink = `https://wa.me/${member.cleanWaNumber}?text=${encodeURIComponent(waGreeting)}`;
+              const callLink = `tel:${member.phone}`;
 
-                {/* 1. PRESIDENT BOX: HUSSAIN RIFNA (Distinct Royal Amber Gold Box) */}
-                {showPresident && presidentMember && (
-                  <div className="relative rounded-3xl overflow-hidden border-2 border-amber-300/90 bg-gradient-to-br from-amber-500/15 via-amber-50/85 to-white/95 shadow-lg shadow-amber-900/10 p-4 transition-all">
-                    {/* Top Decorative Header Strip */}
-                    <div className="flex items-center justify-between pb-3 mb-3 border-b border-amber-200/70">
-                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-xs text-[10px] font-black uppercase tracking-wider">
-                        <Crown className="w-3.5 h-3.5 fill-white text-white" />
-                        <span>Presidential Office</span>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-[11px] font-bold text-amber-900 font-sinhala">ගරු සභාපතිතුමා</span>
-                      </div>
-                    </div>
-
-                    {/* Member Info Row */}
-                    <div className="flex items-center gap-3.5">
-                      {/* Large Monogram with Royal Gold Gradient */}
-                      <div className="w-13 h-13 rounded-2xl bg-gradient-to-tr from-amber-500 via-amber-400 to-amber-200 text-amber-950 flex items-center justify-center font-black text-base shadow-md ring-2 ring-amber-300/80 shrink-0">
-                        HR
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-1">
-                          <h3 className="text-base font-black text-slate-900 truncate">
-                            {presidentMember.name}
-                          </h3>
-
-                          {/* Quick Tools */}
-                          <div className="flex items-center gap-1 shrink-0">
-                            <button
-                              onClick={() => handleCopyPhone(presidentMember)}
-                              className="p-1.5 rounded-lg text-amber-800 hover:bg-amber-100 transition-colors"
-                              title="Copy phone"
-                              aria-label={`Copy phone for ${presidentMember.name}`}
-                            >
-                              {copiedId === presidentMember.id ? (
-                                <Check className="w-4 h-4 text-emerald-600" />
-                              ) : (
-                                <Copy className="w-4 h-4" />
-                              )}
-                            </button>
-                            <button
-                              onClick={() => handleDownloadMemberVCard(presidentMember)}
-                              className="p-1.5 rounded-lg text-amber-800 hover:bg-amber-100 transition-colors"
-                              title="Download contact card"
-                              aria-label={`Download contact for ${presidentMember.name}`}
-                            >
-                              <Download className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Distinct Highlighted President Designation Box below Name */}
-                        <div className="flex items-center gap-2 mt-1 flex-wrap">
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-amber-100/90 text-amber-900 border border-amber-300 text-xs font-black tracking-wide shadow-xs">
-                            <Crown className="w-3 h-3 fill-amber-500 text-amber-600" />
-                            <span>President</span>
-                            <span className="text-amber-800 font-sinhala text-[11px] font-bold">· සභාපති</span>
-                          </span>
-                          <span aria-hidden="true" className="text-amber-300">·</span>
-                          <span className="font-mono-numbers text-slate-600 text-xs font-bold">
-                            {presidentMember.formattedPhone}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Dual Action Buttons (Call President & WhatsApp) */}
-                    <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-amber-200/70">
-                      <a
-                        href={`tel:${presidentMember.phone}`}
-                        className="group/btn flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 text-white border border-amber-400/40 shadow-md shadow-amber-900/20 text-xs font-bold transition-all duration-200 hover:bg-none hover:bg-white hover:text-amber-800 hover:border-amber-500 hover:shadow-lg active:bg-none active:bg-white active:text-amber-800 active:translate-y-0.5"
-                      >
-                        <Phone className="w-3.5 h-3.5 text-white group-hover/btn:text-amber-800 group-active/btn:text-amber-800 transition-colors" />
-                        <span className="text-white group-hover/btn:text-amber-800 group-active/btn:text-amber-800 transition-colors">Call President</span>
-                      </a>
-
-                      <a
-                        href={`https://wa.me/${presidentMember.cleanWaNumber}?text=${encodeURIComponent(
-                          `Assalamu Alaikum / Greetings Mr. ${presidentMember.name} (President), I am contacting you regarding Rambuk-Ela Welfare Association.`
-                        )}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group/btn flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-gradient-to-r from-[#25D366] to-[#128C7E] text-white border border-emerald-400/40 shadow-md shadow-emerald-900/20 text-xs font-bold transition-all duration-200 hover:bg-none hover:bg-white hover:text-[#059669] hover:border-[#25D366] hover:shadow-lg active:bg-none active:bg-white active:text-[#059669] active:translate-y-0.5"
-                      >
-                        <svg className="w-3.5 h-3.5 fill-white text-white group-hover/btn:fill-[#059669] group-active/btn:fill-[#059669] transition-colors" viewBox="0 0 24 24">
-                          <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
-                        </svg>
-                        <span className="text-white group-hover/btn:text-[#059669] group-active/btn:text-[#059669] transition-colors">WhatsApp</span>
-                      </a>
-                    </div>
-                  </div>
-                )}
-
-                {/* 2. VICE PRESIDENT BOX: SHAFEEK WAHAB (Matching Golden Look & Style) */}
-                {showVicePresident && vicePresidentMember && (
-                  <div className="relative rounded-3xl overflow-hidden border-2 border-amber-300/90 bg-gradient-to-br from-amber-500/15 via-amber-50/85 to-white/95 shadow-lg shadow-amber-900/10 p-4 transition-all">
-                    {/* Top Decorative Header Strip */}
-                    <div className="flex items-center justify-between pb-3 mb-3 border-b border-amber-200/70">
-                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-xs text-[10px] font-black uppercase tracking-wider">
-                        <ShieldCheck className="w-3.5 h-3.5 fill-white text-white" />
-                        <span>Vice Presidential Office</span>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-[11px] font-bold text-amber-900 font-sinhala">ගරු උප සභාපතිතුමා</span>
-                      </div>
-                    </div>
-
-                    {/* Member Info Row */}
-                    <div className="flex items-center gap-3.5">
-                      {/* Large Monogram with Royal Gold Gradient */}
-                      <div className="w-13 h-13 rounded-2xl bg-gradient-to-tr from-amber-500 via-amber-400 to-amber-200 text-amber-950 flex items-center justify-center font-black text-base shadow-md ring-2 ring-amber-300/80 shrink-0">
-                        SW
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-1">
-                          <h3 className="text-base font-black text-slate-900 truncate">
-                            {vicePresidentMember.name}
-                          </h3>
-
-                          {/* Quick Tools */}
-                          <div className="flex items-center gap-1 shrink-0">
-                            <button
-                              onClick={() => handleCopyPhone(vicePresidentMember)}
-                              className="p-1.5 rounded-lg text-amber-800 hover:bg-amber-100 transition-colors"
-                              title="Copy phone"
-                              aria-label={`Copy phone for ${vicePresidentMember.name}`}
-                            >
-                              {copiedId === vicePresidentMember.id ? (
-                                <Check className="w-4 h-4 text-emerald-600" />
-                              ) : (
-                                <Copy className="w-4 h-4" />
-                              )}
-                            </button>
-                            <button
-                              onClick={() => handleDownloadMemberVCard(vicePresidentMember)}
-                              className="p-1.5 rounded-lg text-amber-800 hover:bg-amber-100 transition-colors"
-                              title="Download contact card"
-                              aria-label={`Download contact for ${vicePresidentMember.name}`}
-                            >
-                              <Download className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Distinct Highlighted Vice President Designation Box below Name */}
-                        <div className="flex items-center gap-2 mt-1 flex-wrap">
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-amber-100/90 text-amber-900 border border-amber-300 text-xs font-black tracking-wide shadow-xs">
-                            <ShieldCheck className="w-3 h-3 text-amber-700" />
-                            <span>Vice President</span>
-                            <span className="text-amber-800 font-sinhala text-[11px] font-bold">· උප සභාපති</span>
-                          </span>
-                          <span aria-hidden="true" className="text-amber-300">·</span>
-                          <span className="font-mono-numbers text-slate-600 text-xs font-bold">
-                            {vicePresidentMember.formattedPhone}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Dual Action Buttons (Call VP & WhatsApp) */}
-                    <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-amber-200/70">
-                      <a
-                        href={`tel:${vicePresidentMember.phone}`}
-                        className="group/btn flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 text-white border border-amber-400/40 shadow-md shadow-amber-900/20 text-xs font-bold transition-all duration-200 hover:bg-none hover:bg-white hover:text-amber-800 hover:border-amber-500 hover:shadow-lg active:bg-none active:bg-white active:text-amber-800 active:translate-y-0.5"
-                      >
-                        <Phone className="w-3.5 h-3.5 text-white group-hover/btn:text-amber-800 group-active/btn:text-amber-800 transition-colors" />
-                        <span className="text-white group-hover/btn:text-amber-800 group-active/btn:text-amber-800 transition-colors">Call Vice President</span>
-                      </a>
-
-                      <a
-                        href={`https://wa.me/${vicePresidentMember.cleanWaNumber}?text=${encodeURIComponent(
-                          `Assalamu Alaikum / Greetings Mr. ${vicePresidentMember.name} (Vice President), I am contacting you regarding Rambuk-Ela Welfare Association.`
-                        )}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group/btn flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-gradient-to-r from-[#25D366] to-[#128C7E] text-white border border-emerald-400/40 shadow-md shadow-emerald-900/20 text-xs font-bold transition-all duration-200 hover:bg-none hover:bg-white hover:text-[#059669] hover:border-[#25D366] hover:shadow-lg active:bg-none active:bg-white active:text-[#059669] active:translate-y-0.5"
-                      >
-                        <svg className="w-3.5 h-3.5 fill-white text-white group-hover/btn:fill-[#059669] group-active/btn:fill-[#059669] transition-colors" viewBox="0 0 24 24">
-                          <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
-                        </svg>
-                        <span className="text-white group-hover/btn:text-[#059669] group-active/btn:text-[#059669] transition-colors">WhatsApp</span>
-                      </a>
-                    </div>
-                  </div>
-                )}
-              </section>
-            )}
-
-            {/* ============================================================ */}
-            {/* COUNCIL & COMMITTEE MEMBERS SECTION                          */}
-            {/* ============================================================ */}
-            {remainingMembers.length > 0 && (
-              <section className="space-y-2.5 pt-1" aria-label="Council and Committee Members">
-                <div className="flex items-center justify-between px-1">
-                  <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-600">
-                    <Users className="w-3.5 h-3.5 text-slate-500" />
-                    <span>Executive Council & Committee</span>
-                  </div>
-                  <span className="text-[11px] font-semibold text-slate-500">
-                    {remainingMembers.length} Members
-                  </span>
-                </div>
-
-                {remainingMembers.map((member) => {
-                  const avatar = getAvatarBadge(member);
-                  const waGreeting = `Assalamu Alaikum / Greetings Mr. ${member.name}, I am contacting you regarding Rambuk-Ela Welfare Association.`;
-                  const waLink = `https://wa.me/${member.cleanWaNumber}?text=${encodeURIComponent(waGreeting)}`;
-                  const callLink = `tel:${member.phone}`;
-
-                  return (
+              return (
+                <div
+                  key={member.id}
+                  className="p-3.5 sm:p-4 rounded-3xl bg-white shadow-sm border border-slate-100/90 transition-all hover:shadow-md"
+                >
+                  {/* Member Info Row */}
+                  <div className="flex items-center gap-3">
+                    {/* Tier Avatar Rounded Square */}
                     <div
-                      key={member.id}
-                      className="p-3.5 rounded-2xl glass-card glass-card-hover border border-white/85 shadow-sm transition-all"
+                      className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-sm shrink-0 ${style.avatarBg}`}
                     >
-                      {/* Member Info Row */}
-                      <div className="flex items-center gap-3">
-                        {/* Tier Avatar Circle */}
-                        <div
-                          className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-sm shadow-md border ${avatar.bg} shrink-0`}
-                        >
-                          <span>{avatar.initials}</span>
-                        </div>
+                      <span>{style.initials}</span>
+                    </div>
 
-                        {/* Name & Designation */}
-                        <div className="flex-1 min-w-0">
-                          <h3 className="text-sm font-bold text-slate-900 truncate">
-                            {member.name}
-                          </h3>
-                          
-                          {/* Highlighted Designation Pill Badge below name + Phone Number */}
-                          <div className="flex items-center gap-2 text-xs text-slate-600 mt-1 flex-wrap">
-                            <span className={`text-[10px] px-2 py-0.5 rounded-md font-bold border tracking-wide shadow-xs shrink-0 ${avatar.tagColor}`}>
-                              {member.designation}
-                            </span>
-                            <span aria-hidden="true" className="text-slate-300">·</span>
-                            <span className="font-mono-numbers text-slate-500 text-[11px] font-medium">
-                              {member.formattedPhone}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Quick Copy / Download dropdown button */}
-                        <div className="flex items-center gap-1 shrink-0">
-                          <button
-                            onClick={() => handleCopyPhone(member)}
-                            title="Copy phone number"
-                            aria-label={`Copy phone for ${member.name}`}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100/70 transition-colors"
+                    {/* Name & Designation Details */}
+                    <div className="flex-1 min-w-0">
+                      {/* Name + Golden / Highlighted Pill Badge */}
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="text-sm sm:text-base font-bold text-slate-900 truncate">
+                          {member.name}
+                        </h3>
+                        {style.showBadge && (
+                          <span
+                            className={`text-xs px-2 py-0.5 rounded-lg font-bold border tracking-wide shadow-xs shrink-0 ${style.badgeBg}`}
                           >
-                            {copiedId === member.id ? (
-                              <Check className="w-4 h-4 text-emerald-600" />
-                            ) : (
-                              <Copy className="w-4 h-4" />
-                            )}
-                          </button>
-                          <button
-                            onClick={() => handleDownloadMemberVCard(member)}
-                            title="Download contact card"
-                            aria-label={`Download contact for ${member.name}`}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100/70 transition-colors"
-                          >
-                            <Download className="w-4 h-4" />
-                          </button>
-                        </div>
+                            {member.designation}
+                          </span>
+                        )}
                       </div>
 
-                      {/* Dual 3D Quick-Action Buttons (Call & WhatsApp) with Glass Gradients and Invert Hover */}
-                      <div className="grid grid-cols-2 gap-2 mt-3 pt-2.5 border-t border-slate-100/80">
-                        <a
-                          href={callLink}
-                          className="group/btn flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] text-white border border-blue-400/40 shadow-md shadow-blue-900/20 backdrop-blur-md text-xs font-bold transition-all duration-200 hover:bg-none hover:bg-white hover:text-blue-700 hover:border-blue-500 hover:shadow-lg active:bg-none active:bg-white active:text-blue-700 active:translate-y-0.5"
-                        >
-                          <Phone className="w-3.5 h-3.5 text-white group-hover/btn:text-blue-700 group-active/btn:text-blue-700 transition-colors" />
-                          <span className="text-white group-hover/btn:text-blue-700 group-active/btn:text-blue-700 transition-colors">Call Now</span>
-                        </a>
-
-                        <a
-                          href={waLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="group/btn flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-gradient-to-r from-[#25D366] to-[#128C7E] text-white border border-emerald-400/40 shadow-md shadow-emerald-900/20 backdrop-blur-md text-xs font-bold transition-all duration-200 hover:bg-none hover:bg-white hover:text-[#059669] hover:border-[#25D366] hover:shadow-lg active:bg-none active:bg-white active:text-[#059669] active:translate-y-0.5"
-                        >
-                          <svg className="w-3.5 h-3.5 fill-white text-white group-hover/btn:fill-[#059669] group-active/btn:fill-[#059669] transition-colors" viewBox="0 0 24 24">
-                            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
-                          </svg>
-                          <span className="text-white group-hover/btn:text-[#059669] group-active/btn:text-[#059669] transition-colors">WhatsApp</span>
-                        </a>
+                      {/* Phone Number below name (no duplicate designation text) */}
+                      <div className="flex items-center gap-1.5 text-xs mt-1 text-slate-500">
+                        <span className="font-mono-numbers text-xs font-medium">
+                          {member.formattedPhone}
+                        </span>
                       </div>
                     </div>
-                  );
-                })}
-              </section>
-            )}
-          </div>
-        )}
+
+                    {/* Quick Copy / Download dropdown button */}
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        onClick={() => handleCopyPhone(member)}
+                        title="Copy phone number"
+                        aria-label={`Copy phone for ${member.name}`}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100/70 transition-colors"
+                      >
+                        {copiedId === member.id ? (
+                          <Check className="w-4 h-4 text-emerald-600" />
+                        ) : (
+                          <Copy className="w-4 h-4" />
+                        )}
+                      </button>
+                      <button
+                        onClick={() => handleDownloadMemberVCard(member)}
+                        title="Download contact card"
+                        aria-label={`Download contact for ${member.name}`}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100/70 transition-colors"
+                      >
+                        <Download className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Dual Action Buttons (Call Now & WhatsApp) */}
+                  <div className="grid grid-cols-2 gap-2 mt-3 pt-2.5 border-t border-slate-100/80">
+                    <a
+                      href={callLink}
+                      className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-[#1d63ed] hover:bg-[#1550c7] text-white text-xs font-bold shadow-xs active:translate-y-0.5 transition-all"
+                    >
+                      <Phone className="w-3.5 h-3.5 text-white" />
+                      <span>Call Now</span>
+                    </a>
+
+                    <a
+                      href={waLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#25D366] to-[#128C7E] hover:from-[#22c55e] hover:to-[#0f766e] text-white text-xs font-bold shadow-xs active:translate-y-0.5 transition-all"
+                    >
+                      <svg className="w-3.5 h-3.5 fill-white text-white" viewBox="0 0 24 24">
+                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                      </svg>
+                      <span>WhatsApp</span>
+                    </a>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
 
         {/* Bottom Navigation Back to Hub */}
         <div className="mt-6 pt-4 text-center border-t border-white/60">
